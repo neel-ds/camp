@@ -14,7 +14,7 @@ const Home: NextPage = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="./favicon.ico" />
       </Head>
-      <main className="flex px-10 py-20 justify-center items-center">
+      <main className="flex px-10 lg:px-24 pt-36 md:pt-32 lg:py-28 xl:py-20 justify-center items-center">
         <div className="flex flex-col lg:flex-row items-center text-center lg:text-left">
           <div className="flex flex-col justify-center">
             <h1 className="text-5xl sm:text-5xl mx-auto lg:mx-0 md:text-6xl text-gray-900 font-extrabold">
@@ -37,7 +37,7 @@ const Home: NextPage = () => {
                 onClick={() => {
                   router.push("/campaigns");
                 }}
-                className="flex w-full items-center justify-center px-8 py-3 border-0 border-transparent text-base font-medium rounded-3xl bg-secondary md:py-2 md:text-lg md:px-8"
+                className="flex w-full items-center justify-center px-8 py-3 border-0 border-transparent text-base font-medium rounded-3xl bg-secondary shadow-lg md:py-2 md:text-lg md:px-8"
               >
                 Mint now
               </button>
