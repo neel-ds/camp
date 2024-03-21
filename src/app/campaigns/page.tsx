@@ -7,10 +7,12 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { formatEther } from "viem";
 import { useReadContract } from "wagmi";
+import SearchBar from "./Search";
 
 const ExploreCampaigns: NextPage = () => {
   const [campaigns, setCampaigns] = useState<Campaigns[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const { data, isFetched } = useReadContract({
     address: LAUNCHPAD_ADDRESS,
     abi: LAUNCHPAD_ABI,
@@ -41,6 +43,12 @@ const ExploreCampaigns: NextPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, isFetched]);
 
+  const filteredCampaigns = searchQuery
+    ? campaigns.filter((campaign) =>
+        campaign.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : campaigns;
+
   return (
     <>
       <Head>
@@ -50,9 +58,12 @@ const ExploreCampaigns: NextPage = () => {
         <link rel="icon" href="./favicon.ico" />
       </Head>
       <div className="flex flex-col w-full pt-36 pb-20 md:pt-32 md:pb-6 lg:py-28 px-10 md:px-24">
-        <h1 className="text-2xl md:text-3xl text-gray-200 font-primary font-medium">
-          Explore campaigns 🛰️
-        </h1>
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <h1 className="text-2xl md:text-3xl text-gray-200 font-primary font-medium">
+            Explore campaigns 🛰️
+          </h1>
+          <SearchBar setSearchQuery={setSearchQuery} />
+        </div>
         {isLoading ? (
           <div className="flex flex-col mt-5 w-fit bg-[#141414] bg-opacity-20 backdrop-filter backdrop-blur-sm rounded-xl shadow-md p-6">
             <div className="animate-pulse flex flex-col space-x-4">
@@ -71,7 +82,7 @@ const ExploreCampaigns: NextPage = () => {
                 No active NFT memberships yet.
               </p>
             ) : (
-              campaigns.map((data, index) => (
+              filteredCampaigns.map((data, index) => (
                 <Card
                   key={index}
                   name={data.name}
