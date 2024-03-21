@@ -1,11 +1,12 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<Boolean>(false);
   const pathname = usePathname();
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -52,9 +53,9 @@ const Navbar = () => {
           }`}
           id="navbar-default"
         >
-          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0">
+          <ul className="font-medium font-primary flex flex-col p-4 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-10 rtl:space-x-reverse md:mt-0">
             <li>
-              <a
+              <Link
                 href="/"
                 className={`block py-2 px-3 ${
                   pathname && pathname === "/"
@@ -64,10 +65,10 @@ const Navbar = () => {
                 aria-current="page"
               >
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/create"
                 className={`block py-2 px-3 ${
                   pathname && pathname === "/create"
@@ -75,8 +76,8 @@ const Navbar = () => {
                     : "text-gray-300 hover:text-secondary"
                 } rounded-lg hover:bg-neutral-900/40 md:hover:bg-transparent md:border-0 md:hover:text-secondary md:p-0`}
               >
-                Create Campaigns
-              </a>
+                Create Memberships
+              </Link>
             </li>
           </ul>
         </div>
