@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { formatEther } from "viem";
 import { useReadContract } from "wagmi";
 
-const Campaigns: NextPage = () => {
+const ExploreCampaigns: NextPage = () => {
   const [campaigns, setCampaigns] = useState<Campaigns[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { data, isFetched } = useReadContract({
@@ -88,4 +88,4 @@ const Campaigns: NextPage = () => {
   );
 };
 
-export default Campaigns;
+export default ExploreCampaigns;
