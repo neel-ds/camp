@@ -17,9 +17,9 @@ const Navbar = () => {
   }, [isMobileMenuOpen]);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-opacity-20 backdrop-filter backdrop-blur-md mx-5 md:mx-16 lg:mx-20 md:px-10 my-2 border border-neutral-600 bg-[#141414]/20 rounded-xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-opacity-20 backdrop-filter backdrop-blur-md mx-5 md:mx-16 lg:mx-20 md:px-10 my-2 border border-neutral-600 bg-[#141414]/40 rounded-xl">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <div className="hidden md:flex">
+        <div className="hidden lg:flex">
           <span className="self-center text-2xl text-transparent bg-clip-text bg-gradient-to-b from-[#ffd84b] from-[20%] to-[#b67e2b] font-primary font-semibold whitespace-nowrap">
             camp.
           </span>
@@ -27,7 +27,7 @@ const Navbar = () => {
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           type="button"
-          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-100 rounded-lg md:hidden bg-gray-600/50 hover:bg-gray-800/60 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-100 rounded-lg lg:hidden bg-gray-600/50 hover:bg-gray-800/60 focus:outline-none focus:ring-2 focus:ring-gray-500"
           aria-expanded={isMobileMenuOpen ? "true" : "false"}
         >
           <span className="sr-only">Open main menu</span>
@@ -48,7 +48,7 @@ const Navbar = () => {
           </svg>
         </button>
         <div
-          className={`w-full md:block md:w-auto ${
+          className={`w-full lg:block lg:w-auto ${
             isMobileMenuOpen ? "block" : "hidden"
           }`}
           id="navbar-default"
@@ -58,7 +58,7 @@ const Navbar = () => {
               <Link
                 href="/"
                 className={`block py-2 px-3 ${
-                  pathname && pathname === "/"
+                  pathname === "/"
                     ? "text-secondary hover:text-white"
                     : "text-gray-300 hover:text-secondary"
                 } rounded-lg hover:bg-neutral-900/40 md:hover:bg-transparent md:border-0 md:hover:text-secondary md:p-0`}
@@ -69,9 +69,21 @@ const Navbar = () => {
             </li>
             <li>
               <Link
+                href="/campaigns"
+                className={`block py-2 px-3 ${
+                  pathname === "/campaigns"
+                    ? "text-secondary hover:text-white"
+                    : "text-gray-300 hover:text-secondary"
+                } rounded-lg hover:bg-neutral-900/40 md:hover:bg-transparent md:border-0 md:hover:text-secondary md:p-0`}
+              >
+                Explore
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/create"
                 className={`block py-2 px-3 ${
-                  pathname && pathname === "/create"
+                  pathname === "/create"
                     ? "text-secondary hover:text-white"
                     : "text-gray-300 hover:text-secondary"
                 } rounded-lg hover:bg-neutral-900/40 md:hover:bg-transparent md:border-0 md:hover:text-secondary md:p-0`}
