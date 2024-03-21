@@ -50,7 +50,7 @@ const CreateMembership: NextPage = () => {
         },
       });
     }
-  }, [status, error, isSuccess, isValid]);
+  }, [status, isSuccess, isValid]);
 
   const handleCreateMembership = async () => {
     setIsLoading(true);

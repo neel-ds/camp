@@ -14,4 +14,5 @@ export interface Campaigns {
   description: string;
   image: string;
   price: string;
+  nftAddress: string;
 }

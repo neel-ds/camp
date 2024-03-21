@@ -27,16 +27,15 @@ const ExploreCampaigns: NextPage = () => {
         description: pd.description,
         image: pd.image,
         price: formatEther(BigInt(nft.nftPrice)),
+        nftAddress: nft.nftAddress,
       });
     }
-    console.log(nfts);
     setCampaigns(nfts);
     setIsLoading(false);
   };
 
   useEffect(() => {
     if (data && isFetched) {
-      console.log(data);
       fetchData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,12 +71,14 @@ const ExploreCampaigns: NextPage = () => {
                 No active NFT memberships yet.
               </p>
             ) : (
-              campaigns.map((item, index) => (
+              campaigns.map((data, index) => (
                 <Card
                   key={index}
-                  name={item.name}
-                  price={item.price}
-                  image={item.image}
+                  name={data.name}
+                  description={data.description}
+                  price={data.price}
+                  image={data.image}
+                  nftAddress={data.nftAddress}
                 />
               ))
             )}
