@@ -68,7 +68,7 @@ contract NFT is ERC1155 {
         if (counter + 1 > maxSupply) {
             revert NFT_SOLD_OUT();
         }
-        if (msg.value < nftPrice) {
+        if (msg.value < nftPrice) {    // Here's customize wallet balance requirement can be set for minting NFT
             revert SEND_MORE_MONEY();
         }
         if (hasMinted[msg.sender]) {

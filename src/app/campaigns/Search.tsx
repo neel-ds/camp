@@ -14,12 +14,6 @@ const SearchBar = ({ setSearchQuery }: SearchBarProps): JSX.Element => {
   return (
     <form className="w-[20rem] md:w-[25rem]">
       <div className="flex flex-row">
-        <label
-          htmlFor="search-dropdown"
-          className="mb-2 text-sm font-medium sr-only text-white"
-        >
-          Your Email
-        </label>
         <div className="relative w-[66%] md:w-[47%]">
           <button
             id="dropdown-button"
@@ -57,6 +51,23 @@ const SearchBar = ({ setSearchQuery }: SearchBarProps): JSX.Element => {
                 <button
                   type="button"
                   className="inline-flex w-full px-4 py-2 hover:bg-neutral-600 hover:text-white"
+                  /* 
+                    Add onClick handler to set the searchQuery state to the selected filter
+                    Using moralis API to fetch the nfts owned by the user and 
+                    check if it includes the specific whitelist
+                    
+                    ```ts 
+                      await Moralis.start({apiKey: "API_KEY"});
+                      const address = "USER_ADDRESS"
+                      const chain = EvmChain.ETHEREUM;  // It can be any chain
+                      const response = await Moralis.EvmApi.nft.getWalletNFTs({
+                          address,
+                          chain,
+                      });
+                    ```
+                    Using the response list to check the whitelist and 
+                    set the searchQuery state accordingly.
+                  */
                 >
                   Lens Whitelist
                 </button>
@@ -65,6 +76,10 @@ const SearchBar = ({ setSearchQuery }: SearchBarProps): JSX.Element => {
                 <button
                   type="button"
                   className="inline-flex w-full px-4 py-2 hover:bg-neutral-600 hover:text-white"
+                  /* 
+                    Add onClick handler to set the searchQuery state to the selected filter
+                    Using the supply count this item can be filtered
+                  */
                 >
                   Min 20 Supply
                 </button>

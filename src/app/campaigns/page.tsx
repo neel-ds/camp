@@ -22,6 +22,7 @@ const ExploreCampaigns: NextPage = () => {
   const fetchData = async () => {
     let nfts = [];
     for (let nft of data as CampaignData[]) {
+      console.log(nft.uri);
       const response = await fetch(nft.uri);
       const pd = await response.json();
       nfts.push({

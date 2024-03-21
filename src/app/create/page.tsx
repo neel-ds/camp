@@ -69,7 +69,7 @@ const CreateMembership: NextPage = () => {
           abi: LAUNCHPAD_ABI,
           functionName: "createNFT",
           args: [
-            `https://${cid}.ipfs.dweb.link/metadata.json`,
+            `https://${cid}.ipfs.nftstorage.link/metadata.json`,
             supply,
             maxSupplyFlag,
             parseEther(price.toString()),
@@ -100,7 +100,9 @@ const CreateMembership: NextPage = () => {
                 setImage(image);
                 const file = e.target.files;
                 client.storeDirectory(file).then((cid) => {
-                  setImageUrl(`https://${cid}.ipfs.w3s.link/${file[0].name}`);
+                  setImageUrl(
+                    `https://${cid}.ipfs.nftstorage.link/${file[0].name}`
+                  );
                   setIsImageUploading(false);
                 });
               }}

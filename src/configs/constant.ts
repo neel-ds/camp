@@ -1,4 +1,4 @@
-export const LAUNCHPAD_ADDRESS = "0x6Ee34B8404b16F5CaB2f7862b20629a6F2b76469";
+export const LAUNCHPAD_ADDRESS = "0x8e646c314fe1D98b619f46767ee3119F7e7Fb7ae";
 
 export interface CampaignData {
   uri: string;
