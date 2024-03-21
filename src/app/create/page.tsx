@@ -4,15 +4,80 @@ import { NextPage } from "next";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import Head from "next/head";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { NFTStorage } from "nft.storage";
+import {
+  useAccount,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
+import { parseEther } from "viem";
+import { LAUNCHPAD_ABI, LAUNCHPAD_ADDRESS } from "@/configs";
+import toast from "react-hot-toast";
 
 const CreateMembership: NextPage = () => {
-  const [name, setName] = useState<String>("");
-  const [description, setDescription] = useState<String>("");
-  const [supply, setSupply] = useState<Number>(0);
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [supply, setSupply] = useState<number>(10);
   const [image, setImage] = useState<string | StaticImport>("");
-  const [price, setPrice] = useState<Number>(0);
-  const [maxSupplyFlag, setMaxSupplyFlag] = useState<Boolean>(false);
+  const [price, setPrice] = useState<number>(0);
+  const [maxSupplyFlag, setMaxSupplyFlag] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [isImageUploading, setIsImageUploading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const NFT_STORAGE_TOKEN = process.env.NEXT_PUBLIC_NFT_STORAGE_TOKEN as string;
+  const client = new NFTStorage({ token: NFT_STORAGE_TOKEN });
+  const { address } = useAccount();
+
+  const { data, writeContract, status, error } = useWriteContract();
+  const { isSuccess, status: isValid } = useWaitForTransactionReceipt({
+    hash: data,
+  });
+
+  useEffect(() => {
+    if (status === "success" && isSuccess && isValid === "success") {
+      setIsLoading(false);
+      toast.success("Membership Created Successfully", {
+        style: {
+          borderRadius: "10px",
+        },
+      });
+    } else if (status === "error") {
+      setIsLoading(false);
+      toast.error("Something went wrong", {
+        style: {
+          borderRadius: "10px",
+        },
+      });
+    }
+  }, [status, error, isSuccess, isValid]);
+
+  const handleCreateMembership = async () => {
+    setIsLoading(true);
+    const metadata = {
+      name: name,
+      description: description,
+      image: imageUrl,
+    };
+
+    await client
+      .storeDirectory([new File([JSON.stringify(metadata)], "metadata.json")])
+      .then((cid) => {
+        writeContract({
+          account: address,
+          address: LAUNCHPAD_ADDRESS,
+          abi: LAUNCHPAD_ABI,
+          functionName: "createNFT",
+          args: [
+            `https://${cid}.ipfs.dweb.link/metadata.json`,
+            supply,
+            maxSupplyFlag,
+            parseEther(price.toString()),
+            address,
+          ],
+        });
+      });
+  };
 
   return (
     <>
@@ -28,9 +93,17 @@ const CreateMembership: NextPage = () => {
             <Upload
               id="image"
               name="image"
-              label="Image"
               type="file"
-              onChange={(e) => {}}
+              onChange={(e) => {
+                setIsImageUploading(true);
+                const image = URL.createObjectURL(e.target.files[0]);
+                setImage(image);
+                const file = e.target.files;
+                client.storeDirectory(file).then((cid) => {
+                  setImageUrl(`https://${cid}.ipfs.w3s.link/${file[0].name}`);
+                  setIsImageUploading(false);
+                });
+              }}
             />
             <Image
               className="mx-auto rounded-lg"
@@ -86,10 +159,34 @@ const CreateMembership: NextPage = () => {
           <button
             onClick={async (e) => {
               e.preventDefault();
+              if (!address) {
+                toast.error("Please connect your wallet", {
+                  icon: "🔗",
+                  style: {
+                    borderRadius: "10px",
+                  },
+                });
+                return;
+              }
+              if (name && description && price && imageUrl) {
+                await handleCreateMembership();
+              } else {
+                toast("Please fill all the fields", {
+                  icon: "🚧",
+                  style: {
+                    borderRadius: "10px",
+                  },
+                });
+              }
             }}
-            className="w-full text-[#fffff] bg-secondary hover:bg-secondary/90 rounded-lg px-5 py-2.5 text-center font-medium shadow"
+            className="w-full text-[#fffff] bg-secondary hover:bg-secondary/90 rounded-lg px-5 py-2.5 text-center font-medium shadow disabled:opacity-75 disabled:cursor-progress"
+            disabled={isImageUploading || isLoading}
           >
-            Create Membership 🚀
+            {isImageUploading
+              ? "Uploading Image..."
+              : isLoading
+              ? "Creating NFT membership..."
+              : "Create Membership 🚀"}
           </button>
         </form>
       </div>

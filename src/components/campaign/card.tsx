@@ -1,16 +1,17 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element -- To avoid img element warning */
 import React from "react";
 
 interface ICard {
   name: string;
   price: string;
+  image: string;
 }
 
-const Card = ({ name, price }: ICard) => {
+const Card = ({ name, price, image }: ICard) => {
   return (
     <div className="flex flex-col w-fit bg-[#141414] bg-opacity-20 backdrop-filter backdrop-blur-sm rounded-xl shadow-md p-6">
-      <Image
-        src="/mintAsset.png"
+      <img
+        src={image}
         alt={name}
         width={300}
         height={300}
@@ -20,7 +21,7 @@ const Card = ({ name, price }: ICard) => {
         {name}
       </h2>
       <span className="flex flex-row justify-between items-center">
-        <p className="text-gray-300 font-primary font-normal">{price}</p>
+        <p className="text-gray-300 font-primary font-normal">{price} ETH</p>
         <button className="bg-gradient-to-br from-[#ffd84b] from-[20%] to-[#b67e2b] hover:from-[#ffd643] hover:from-[20%] hover:to-[#c18d40] font-primary font-medium items-center rounded-lg px-5 py-1.5">
           Mint
         </button>

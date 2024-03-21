@@ -45,9 +45,3 @@ const Input = ({
 };
 
 export default Input;
-
-Input.defaultProps = {
-  label: "",
-  placeholder: "",
-  type: "text",
-};

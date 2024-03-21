@@ -29,10 +29,3 @@ const Upload = ({ id, name, type, accept, onChange }: IUpload) => {
 };
 
 export default Upload;
-
-Upload.defaultProps = {
-  label: "",
-  placeholder: "",
-  type: "file",
-  accept: "image/*",
-};

@@ -7,23 +7,21 @@ error ONLY_ONWER_CAN_CALL();
 error SEND_SUFFICIENT_ETH();
 
 contract LaunchPadNft {
+
     // LaunchPadNft contract onwer
     address private launchPadNftOwner;
 
     // number of NFT Created
     uint256 private numOfNftCreated;
 
+    // Array to store all creator addresses
+    address[] public allCreators;
+
     // Cap for Maximum NFT Minted
     uint256 private nftMaxSupply;
 
     // events
-    event CreateNewNft(
-        string uri,
-        uint supply,
-        uint nftPrice,
-        address factoryContractAddress,
-        address indexed nftAddress
-    );
+    event CreateNewNft(string uri, uint supply, uint nftPrice, address factoryContractAddress, address indexed nftAddress);
     event WithdrawMoney(address withdrawAddress, uint amount);
 
     /**
@@ -49,7 +47,7 @@ contract LaunchPadNft {
 
     // modifier to allow onwer to call the function
     modifier onlyOwner() {
-        if (msg.sender != launchPadNftOwner) {
+        if(msg.sender != launchPadNftOwner){
             revert ONLY_ONWER_CAN_CALL();
         }
         _;
@@ -69,16 +67,10 @@ contract LaunchPadNft {
      * @param _nftPrice : Price of the NFT
      * @param _creatorAddress : Address of the Creator
      */
-    function createNFT(
-        string memory _uri,
-        uint256 _maxSupply,
-        bool _wantMaxSupply,
-        uint _nftPrice,
-        address _creatorAddress
-    ) public {
+    function createNFT(string memory _uri, uint256 _maxSupply , bool _wantMaxSupply, uint _nftPrice, address _creatorAddress) public {
         nftMaxSupply = _maxSupply;
 
-        if (_wantMaxSupply == false) {
+        if(_wantMaxSupply == false){
             nftMaxSupply = type(uint256).max;
         }
 
@@ -89,18 +81,16 @@ contract LaunchPadNft {
             address(this),
             _creatorAddress
         );
-
+    
         // Increment the number of NFT
         ++numOfNftCreated;
 
         // emit CreateNewCourse event
-        emit CreateNewNft(
-            _uri,
-            _maxSupply,
-            _nftPrice,
-            address(this),
-            _creatorAddress
-        );
+        emit CreateNewNft(_uri, _maxSupply, _nftPrice, address(this), _creatorAddress);
+
+        if (!isCreatorExists(_creatorAddress)) {
+            allCreators.push(_creatorAddress);
+        }
 
         // Add the new NFT to the mapping
         allNftData[_creatorAddress].push(
@@ -113,9 +103,21 @@ contract LaunchPadNft {
                 address(nft)
             )
         );
-
+        
         // search the profile by using creator address
         nftAddresses[_creatorAddress].push(address(nft));
+    }
+
+    /**
+     * @dev function to check if a creator address already exists
+     */
+    function isCreatorExists(address _creatorAddress) internal view returns (bool) {
+        for (uint i = 0; i < allCreators.length; i++) {
+            if (allCreators[i] == _creatorAddress) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -127,19 +129,26 @@ contract LaunchPadNft {
     }
 
     // function to withdraw the funds from Launchpad contract
-    function withdraw(
-        uint256 _amount,
-        address _receiver
-    ) external payable onlyOwner {
-        if (address(this).balance < _amount) {
+    function withdraw(uint256 _amount, address _receiver) external payable onlyOwner{
+        if(address(this).balance < _amount){
             revert NOT_ENOUGH_BALANCE();
         }
 
         (bool success, ) = _receiver.call{value: _amount}("");
-        if (!success) {
+        if(!success){
             revert TRANSFER_FAILED();
         }
-        emit WithdrawMoney(_receiver, _amount);
+        emit WithdrawMoney(_receiver , _amount);
+    }
+
+    // get the count of all creators
+    function getAllCreatorsCount() public view returns (uint) {
+        return allCreators.length;
+    }
+
+    // get all creators
+    function getAllCreators() public view returns (address[] memory) {
+        return allCreators;
     }
 
     // get the address of Launchpad contract
@@ -153,20 +162,47 @@ contract LaunchPadNft {
     }
 
     // get the number of NFT Created
-    function getNftCreated() public view returns (uint) {
+    function getNftCreated() public view returns(uint){
         return numOfNftCreated;
     }
 
     // get all NFTs with metadata by creator address
-    function getNFTsWithMetadataCreatedByCreator(
-        address _creatorAddress
-    ) public view returns (NftStruct[] memory) {
+    function getNFTsWithMetadataCreatedByCreator(address _creatorAddress) public view returns(NftStruct[] memory){
         address[] memory _NFTAddresses = nftAddresses[_creatorAddress];
         NftStruct[] memory _NFTs = new NftStruct[](_NFTAddresses.length);
-        for (uint i = 0; i < _NFTAddresses.length; i++) {
+        for(uint i = 0; i < _NFTAddresses.length; i++){
             _NFTs[i] = allNftData[_creatorAddress][i];
         }
         return _NFTs;
+    }
+
+    // get all NFTs with metadata
+    function getAllNFTsWithMetadata() public view returns(NftStruct[] memory){
+        uint totalCreators = getAllCreatorsCount();
+        NftStruct[] memory allNFTs = new NftStruct[](numOfNftCreated);
+
+        uint index;
+        // Iterate through all creators' addresses
+        for (uint i = 0; i < totalCreators; i++) {
+            address creatorAddress = getAllCreators()[i];
+            NftStruct[] memory nftsCreatedByCreator = getNFTsWithMetadataCreatedByCreator(creatorAddress);
+
+            // Append NFTs created by this creator to the array
+            for (uint j = 0; j < nftsCreatedByCreator.length; j++) {
+                NftStruct memory nft = nftsCreatedByCreator[j];
+                allNFTs[index] = NftStruct(
+                    nft.uri,
+                    nft.supply,
+                    nft.nftPrice,
+                    nft.launchPadNftAddress,
+                    nft.creator,
+                    nft.nftAddress
+                );
+                index++;
+            }
+        }
+
+    return allNFTs;
     }
 
     // receive function is used to receive Ether when msg.data is empty

@@ -37,8 +37,3 @@ const Checkbox = ({
 };
 
 export default Checkbox;
-
-Checkbox.defaultProps = {
-  label: "",
-  helper: "",
-};

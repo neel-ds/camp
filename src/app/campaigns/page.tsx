@@ -1,52 +1,47 @@
 "use client";
 import { Card } from "@/components";
+import { LAUNCHPAD_ABI, LAUNCHPAD_ADDRESS } from "@/configs";
+import type { CampaignData, Campaigns } from "@/configs";
 import { NextPage } from "next";
 import Head from "next/head";
-
-const dummy = [
-  {
-    name: "Campaign 1",
-    price: "0.05 ETH",
-  },
-  {
-    name: "Campaign 2",
-    price: "0.1 ETH",
-  },
-  {
-    name: "Campaign 3",
-    price: "0.15 ETH",
-  },
-  {
-    name: "Campaign 4",
-    price: "0.2 ETH",
-  },
-  {
-    name: "Campaign 5",
-    price: "0.25 ETH",
-  },
-  {
-    name: "Campaign 6",
-    price: "0.3 ETH",
-  },
-  {
-    name: "Campaign 7",
-    price: "0.35 ETH",
-  },
-  {
-    name: "Campaign 8",
-    price: "0.4 ETH",
-  },
-  {
-    name: "Campaign 9",
-    price: "0.45 ETH",
-  },
-  {
-    name: "Campaign 10",
-    price: "0.5 ETH",
-  },
-];
+import { useEffect, useState } from "react";
+import { formatEther } from "viem";
+import { useReadContract } from "wagmi";
 
 const Campaigns: NextPage = () => {
+  const [campaigns, setCampaigns] = useState<Campaigns[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { data, isFetched } = useReadContract({
+    address: LAUNCHPAD_ADDRESS,
+    abi: LAUNCHPAD_ABI,
+    functionName: "getAllNFTsWithMetadata",
+  });
+
+  const fetchData = async () => {
+    let nfts = [];
+    for (let nft of data as CampaignData[]) {
+      const response = await fetch(nft.uri);
+      const pd = await response.json();
+      nfts.push({
+        name: pd.name,
+        description: pd.description,
+        image: pd.image,
+        price: formatEther(BigInt(nft.nftPrice)),
+      });
+    }
+    console.log(nfts);
+    setCampaigns(nfts);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (data && isFetched) {
+      console.log(data);
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, isFetched]);
+
   return (
     <>
       <Head>
@@ -59,11 +54,35 @@ const Campaigns: NextPage = () => {
         <h1 className="text-2xl md:text-3xl text-gray-200 font-primary font-medium">
           Explore campaigns 🛰️
         </h1>
-        <div className="grid grid-flow-row grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-8">
-          {dummy.map((item, index) => (
-            <Card key={index} name={item.name} price={item.price} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex flex-col mt-5 w-fit bg-[#141414] bg-opacity-20 backdrop-filter backdrop-blur-sm rounded-xl shadow-md p-6">
+            <div className="animate-pulse flex flex-col space-x-4">
+              <div className="rounded-xl bg-neutral-700/80 h-48 w-[12rem]"></div>
+              <div className="block h-4 mt-5 items-start bg-gray-400 rounded w-3/4"></div>
+              <div className="flex flex-row justify-between mt-2">
+                <div className="h-6 w-16 bg-gray-300/80 rounded"></div>
+                <div className="h-8 w-20 bg-primary/50 rounded-lg"></div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-flow-row grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-8">
+            {campaigns.length === 0 ? (
+              <p className="text-secondary text-lg">
+                No active NFT memberships yet.
+              </p>
+            ) : (
+              campaigns.map((item, index) => (
+                <Card
+                  key={index}
+                  name={item.name}
+                  price={item.price}
+                  image={item.image}
+                />
+              ))
+            )}
+          </div>
+        )}
       </div>
     </>
   );
