@@ -49,6 +49,7 @@ const Card = ({ name, price, image, nftAddress }: Campaigns) => {
       });
     } else if (status === "error") {
       setIsLoading(false);
+      console.log(error);
       const message = error.toString();
       const regex = /Error: ([A-Z_]+)\(\)/;
       const match = message.match(regex);
